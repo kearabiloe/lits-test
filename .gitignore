@@ -1,6 +1,8 @@
 env/
 media/
 static/
+users_avatars/
+vendors_avatars/
 __pycache__
 *.log
 *.pyc
