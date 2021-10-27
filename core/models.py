@@ -17,7 +17,7 @@ class Vendor(models.Model):
     avatar = models.ImageField(null=True, blank=True, upload_to='vendors_avatars')
 
     def __str__(self):
-        return "%s by %s"%(self.name, self.user.username)
+        return self.name
 
 
 class Material(models.Model):
@@ -30,7 +30,7 @@ class Material(models.Model):
     price = models.DecimalField(decimal_places=2, max_digits=20, default=0)
 
     def __str__(self):
-        return "%s by %s"%(self.name, self.vendor.name)
+        return self.name
 
 
 class OrderItem(models.Model):
@@ -41,8 +41,33 @@ class OrderItem(models.Model):
     quantity = models.IntegerField(default=1)
     added = models.DateTimeField(auto_now_add=True,null=True,blank=True)
 
+    @property
     def total(self):
         return self.material.price*self.quantity
 
+
     def __str__(self):
-        return self.material.name
+        return "%s %s @ R%s each"%(self.quantity, self.material.name, self.material.price)
+
+
+class Order(models.Model):
+    """
+    A model to store order information.
+    """
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, blank=True, null=True)
+    items = models.ManyToManyField(OrderItem, blank=True)
+    placed_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    placed_date = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+    delivery_date = models.DateField(null=True,blank=True)
+    comment = models.TextField(max_length=500, blank=True, null=True)
+    notification_sent = models.BooleanField(default=False)
+
+    @property
+    def total(self):
+        total = 0
+        for i in self.items.all():
+            total += i.total
+        return total
+
+    def __str__(self):
+        return "Order #%s from %s"%(self.id, self.vendor)
