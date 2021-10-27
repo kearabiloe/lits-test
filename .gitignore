@@ -3,6 +3,7 @@ media/
 static/
 users_avatars/
 vendors_avatars/
+materials_images/
 __pycache__
 *.log
 *.pyc
