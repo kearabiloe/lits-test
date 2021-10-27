@@ -31,3 +31,18 @@ class Material(models.Model):
 
     def __str__(self):
         return "%s by %s"%(self.name, self.vendor.name)
+
+
+class OrderItem(models.Model):
+    """
+    A model to store order items information.
+    """
+    material = models.ForeignKey(Material,on_delete=models.SET_NULL, null=True, blank=True)
+    quantity = models.IntegerField(default=1)
+    added = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+
+    def total(self):
+        return self.material.price*self.quantity
+
+    def __str__(self):
+        return self.material.name
