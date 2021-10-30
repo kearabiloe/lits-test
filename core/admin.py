@@ -1,6 +1,14 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.conf import settings
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import *
+
+class UserAdmin(BaseUserAdmin):
+    fieldsets = BaseUserAdmin.fieldsets + (
+        (None, {'fields': ('avatar',)}),
+    )
+
+
 
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ["__str__","quantity","total"]
@@ -10,6 +18,8 @@ class OrderItemAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ["__str__","total"]
     raw_id_fields = ("items",)
+
+# Re-register UserAdmin
 admin.site.register(User, UserAdmin)
 admin.site.register(Vendor)
 admin.site.register(Material)

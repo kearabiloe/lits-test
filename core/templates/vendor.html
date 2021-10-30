@@ -1,0 +1,78 @@
+{% extends 'base.html'%}
+{% block page_title %}{{ request.user.vendor }} | {{ request.user }}{% endblock %}
+{% block body %}
+{% load core_tags %}
+<div class="container">
+  <main>
+    <div class="py-5 text-center">
+      <img class="d-block mx-auto mb-4" src="{% if request.user.avatar %}{{ request.user.avatar.url }}{% endif %}" alt="" width="72" height="57">
+      <h1>{{ request.user.username|capfirst }}</h1>
+      <p class="lead"></p>
+    </div>
+
+
+    <div class="col-md-12">
+      <h2 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-primary">{{request.user.vendor}} Orders</span>
+        <span class="badge bg-primary rounded-pill">{{orders.count}}</span>
+      </h2>
+      <ul class="list-group">
+        {% for order in orders %}
+
+        <li class="list-group-item d-flex justify-content-between lh-sm my-2 ">
+          <div>
+            <h3 class="my-0">Order #{{order.id}}</h3>
+            <small class="text-primary"> {{order.placed_date}}</small>
+            <h4 class="pt-3">Materials Ordered:</h4>
+            <ul>
+              {% for item in order.items.all %}
+              <li>{{item}} - {{item.material.vendor}}</li>
+              {% endfor %}
+            </ul>
+            <br/>
+            <p><strong>Comment:</strong> {{order.comment|default:'No Customer Comment'}}</p>
+            <p><strong>Delivery Date:</strong> {{order.delivery_date}}</p>
+            <p><strong>Placed By:</strong> {{order.placed_by|capfirst}}</p>
+          </div>
+          <span class="text-muted">
+            <ul>
+              <li>
+                <strong>R {% calculate_vat order.total exclusive=True%}</strong>
+                <p>Sub Total</p>
+              </li>
+              <li>
+                <strong>R {% calculate_vat order.total %}</strong>
+                <p>15% VAT</p>
+              </li>
+
+            </ul>
+            <li class="list-group-item d-flex justify-content-between text-primary">
+              <span>Total</span>
+              <strong>{% sum_orders order single=True items=True %} Items</strong>
+              <strong>R {{order.total}}</strong>
+            </li>
+          </span>
+        </li>
+
+        {% endfor %}
+        <li class="list-group-item d-flex justify-content-between text-danger pt-3 mt-5">
+          <span>Total</span>
+          <strong>{% sum_orders orders items=True %} Items</strong>
+          <strong>R {% sum_orders orders %}</strong>
+        </li>
+      </ul>
+
+    </div>
+
+  </main>
+
+  <footer class="my-5 pt-5 text-muted text-center text-small">
+    <p class="mb-1">&copy; 2017–2021 Company Name</p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="#">Privacy</a></li>
+      <li class="list-inline-item"><a href="#">Terms</a></li>
+      <li class="list-inline-item"><a href="#">Support</a></li>
+    </ul>
+  </footer>
+</div>
+{% endblock %}

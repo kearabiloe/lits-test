@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 class User(AbstractUser):
     '''
@@ -12,7 +13,7 @@ class Vendor(models.Model):
     """
     A model to store vendor information.
     """
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     avatar = models.ImageField(null=True, blank=True, upload_to='vendors_avatars')
 
@@ -47,7 +48,7 @@ class OrderItem(models.Model):
 
 
     def __str__(self):
-        return "%s %s @ R%s each"%(self.quantity, self.material.name, self.material.price)
+        return "%s x %s @ R%s each"%(self.quantity, self.material.name, self.material.price)
 
 
 class Order(models.Model):
@@ -56,7 +57,7 @@ class Order(models.Model):
     """
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, blank=True, null=True)
     items = models.ManyToManyField(OrderItem, blank=True)
-    placed_by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    placed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     placed_date = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     delivery_date = models.DateField(null=True,blank=True)
     comment = models.TextField(max_length=500, blank=True, null=True)
