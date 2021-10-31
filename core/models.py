@@ -72,3 +72,15 @@ class Order(models.Model):
 
     def __str__(self):
         return "Order #%s from %s"%(self.id, self.vendor)
+
+def signals_import():
+    """ A note on signals.
+
+    The signals need to be imported early on so that they get registered
+    by the application. Putting the signals here makes sure of this since
+    the models package gets imported on the application startup.
+    """
+    from core.tasks import send_order_confirmation_email
+    models.signals.post_save.connect(send_order_confirmation_email, sender=Order)
+
+signals_import()

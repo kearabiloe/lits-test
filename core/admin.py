@@ -18,6 +18,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ["__str__","total"]
     raw_id_fields = ("items",)
+    readonly_fields = ('placed_date',)
 
 # Re-register UserAdmin
 admin.site.register(User, UserAdmin)

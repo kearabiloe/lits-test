@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'tastypie',
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,62 @@ MEDIAFILES_LOCATION = 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'core.User'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/'
+
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', False)
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', False)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'okota.log',
+            'formatter': 'verbose'
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'propagate': True,
+            'level': 'WARNING',
+            'formatter': 'verbose',
+        },
+        'core': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'formatter': ['verbose'],
+        },
+        'celery.task': {
+            'handlers': ['file', 'console'],
+            'propagate': True,
+            'level': 'DEBUG',
+            'formatter': ['verbose'],
+        }
+    }
+}

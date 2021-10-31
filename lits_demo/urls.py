@@ -14,14 +14,29 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from core.views import *
+from tastypie.api import Api
+from core.api.resources import OrderResource, MaterialResource, VendorResource
+from django.contrib.auth.views import LoginView
+
+v1_api = Api(api_name='v1')
+v1_api.register(VendorResource())
+v1_api.register(OrderResource())
+v1_api.register(MaterialResource())
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('vendor/', VendorView.as_view(), name="vendor"),
+    path('order/', OrderView.as_view(), name="order"),
+    path('login/', LoginView.as_view(
+        template_name='admin/login.html',
+        extra_context={'site_header': 'LITS',}), name="login"
+    ),
+    path('api/', include(v1_api.urls)),
+    path('', OrderView.as_view(), name="home"),
 ]
 #Work around for serving media files localy
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
