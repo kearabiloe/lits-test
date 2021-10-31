@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import *
-
+from .tasks import *
 # Create your views here.
 class VendorView(LoginRequiredMixin,View):
     '''
@@ -35,11 +35,9 @@ class OrderView(LoginRequiredMixin,View):
 
     def post(self, request, *args, **kwargs):
         context ={}
-        print(request.POST)
         materials = []
         for item in request.POST:
             #Build Order materials
-            print(item)
             if item.startswith('material_'):
                 materials.append( (item.split('_')[1],request.POST.get(item)))
         vendor = Vendor.objects.get(id=request.POST.get('vendor'))
@@ -50,7 +48,6 @@ class OrderView(LoginRequiredMixin,View):
             comment=request.POST.get('comment')
         )
         for item in materials:
-            print(item)
             material = Material.objects.get(id=item[0])
             order_item = OrderItem.objects.create(
                 material=material,
@@ -58,4 +55,5 @@ class OrderView(LoginRequiredMixin,View):
                 )
             order.items.add(order_item)
         order.save()
+        send_order_confirmation_email(order)
         return redirect('vendor')

@@ -20,11 +20,6 @@ Install the *requirements.txt* file:
 
 `$ pip install -r requirements.txt`
 
-
-#### local.py (development specific) settings file
-Copy `configs/settings.py` & `configs/wsgi.py`  into the 'okota_website' folder.
-Remember to change server specific settings including the database credentials
-
 #### Sample Databse (Testing specific) dump  file
 Restore the 'sample.dump' file using pg_restore
 
@@ -33,6 +28,20 @@ Restore the 'sample.dump' file using pg_restore
 `./manage.py makemigrations `
 
 `./manage.py migrate  `
+
+### Environment Variable
+Export your email details. Note that the emails will be logged to console when DEBUG=True. Disable behaviour in settings.py
+
+```
+export EMAIL_HOST=value
+export EMAIL_PORT=value
+export EMAIL_HOST_USER=value
+export EMAIL_HOST_PASSWORD=value
+export EMAIL_USE_SSL=value
+export EMAIL_USE_TLS=value
+export DEFAULT_FROM_EMAIL=value
+
+```
 
 ### Ready? Go!
 

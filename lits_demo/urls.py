@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from core.views import *
 from tastypie.api import Api
 from core.api.resources import OrderResource, MaterialResource, VendorResource
+from django.contrib.auth.views import LoginView
 
 v1_api = Api(api_name='v1')
 v1_api.register(VendorResource())
@@ -30,6 +31,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('vendor/', VendorView.as_view(), name="vendor"),
     path('order/', OrderView.as_view(), name="order"),
+    path('login/', LoginView.as_view(
+        template_name='admin/login.html',
+        extra_context={'site_header': 'LITS',}), name="login"
+    ),
     path('api/', include(v1_api.urls)),
     path('', OrderView.as_view(), name="home"),
 ]
