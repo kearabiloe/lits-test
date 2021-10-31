@@ -3,6 +3,7 @@
 {% block body %}
 {% load core_tags %}
 <div class="container">
+  {% include 'header.html' %}
   <main>
     <div class="py-5 text-center">
       <img class="d-block mx-auto mb-4" src="{% if request.user.avatar %}{{ request.user.avatar.url }}{% endif %}" alt="" width="72" height="57">

@@ -1,0 +1,127 @@
+{% extends 'base.html'%}
+{% block page_title %}{{ request.user.vendor }} | {{ request.user }}{% endblock %}
+{% block body %}
+{% load core_tags %}
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  {% include 'header.html' %}
+  <main class="px-3">
+    <h1>Cover your page.</h1>
+    <p class="lead">Cover is a one-page template for building simple and beautiful home pages. Download, edit the text, and add your own fullscreen background photo to make it your own.</p>
+    <p class="lead">
+      <div class="dropdown">
+        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+          Please select vendor
+        </a>
+
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          {% for vendor in vendors %}
+          <li><a class="dropdown-item" onclick="toggle_vendor({{vendor.id}})" href="#">{{vendor.name}}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </p>
+    <form class="row" method="post" target="">
+      <div id="vendorMaterials" class="col-sm-8"></div>
+      <div class="col-sm-4 bg-white text-dark" id="cart">
+          <h4>Sub Total: R<span id="sub_total">0.00</span></h5>
+          <h5>VAT (15%): R<span id="vat">0.00</span></h5>
+          <h3>Total: R<span id="total">0.00</span></h3>
+          <div class="col-12">
+            <label for="delivery_date" class="form-label">Delivery Date</label>
+            <input type="text" class="form-control" id="delivery_date" name="delivery_date" placeholder="YYYY-MM-DD">
+          </div>
+
+          <div class="col-12">
+            <label for="comment" class="form-label">Comment</label>
+            <textarea class="form-control" id="comment" name="comment" placeholder="Say something"></textarea>
+          </div>
+
+          <div class="col-12 p-5">
+            <button type="submit" class="btn btn-primary">Confirm Order</button>
+          </div>
+          {% csrf_token %}
+          <input type="hidden" class="form-control" id="vendor" name="vendor" >
+      </div>
+    </form>
+  </main>
+
+</div>
+
+<script type="text/javascript">
+
+var cart = {
+  'items':{},
+  'total':0,
+  'sub_total':0,
+  'vat':0
+};
+var materials = [];
+  function toggle_vendor(id,name){
+    console.log(id);
+    $("#vendorMaterials").empty();
+    populate_materials(id);
+    $("#cart #vendor")[0].value = id;
+    alert("....Fetching Materials");
+  }
+
+
+  function populate_materials(vendor_id) {
+    $.getJSON( "/api/v1/material/?vendor="+vendor_id, function( data ) {
+      materials = data.objects;
+      data['objects'].forEach(
+        function(material){
+          console.log(material)
+          $( "#vendorMaterials" ).append( `
+          <div class="col-md-4">
+            <div class="card text-dark">
+              <div class="card-body">
+                <strong class="card-title">${material.name} | R ${material.price} each</strong>
+                <p class="card-text">
+                  Order ${material.name} by ${material.vendor.name}.
+                  <br/>
+                  <small>Price includes VAT</small>
+                  </p>
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Quantity</span>
+                  <input type="number" class="form-control" name="material_${material.id}" id="material_${material.id}" value="0">
+                </div>
+                <button type="button" class="btn btn-primary" onclick="add_to_cart(${material.id},${material.price})">Add to cart</button>
+              </div>
+            </div>
+          </div>
+
+          ` );
+        });
+
+    });
+  }
+
+
+  function update_cart_display(){
+    cart.total = 0;
+    console.log(cart.items);
+    for(i in cart.items){
+      item = cart.items[i];
+      cart.total = cart.total + item.total;
+    }
+    cart.vat = cart.total * 0.15;
+    cart.sub_total = cart.total - cart.vat
+    $("#cart #sub_total")[0].textContent = cart.sub_total;
+    $("#cart #vat")[0].textContent = cart.vat;
+    $("#cart #total")[0].textContent = cart.total;
+  }
+
+
+  function add_to_cart(material_id,price){
+    material_input = $('#material_'+material_id)[0];
+    console.log(material_input);
+    qty = material_input.value;
+    cart.items[material_id] = {};
+    cart.items[material_id]['id']=material_id;
+    cart.items[material_id]['quantity']=qty;
+    cart.items[material_id]['total']=parseFloat(price)*parseFloat(qty);
+    console.log(cart);
+    update_cart_display()
+  }
+</script>
+{% endblock %}
