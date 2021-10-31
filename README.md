@@ -11,9 +11,9 @@ kea's Submission (LITS)
 
 
 ### Download
-Now, you need the *okota* project files in your workspace:
+Now, you need the *lits-test* project files in your workspace:
 
-    $ git clone git@github.com:kearabiloe/okota.git .
+    $ git clone git@github.com:kearabiloe/lits-test.git .
 
 ### Requirements
 Install the *requirements.txt* file:
